@@ -47,8 +47,12 @@ extension Image {
     @_specialize(exported: true, where Pixel == ${type})
 % end
     public mutating func update(_ body: (inout Pixel) throws -> ()) rethrows {
-        for i in pixels.indices {
-            try body(&pixels[i])
+        let count = self.count
+        guard count > 0 else { return }
+        try pixels.withUnsafeMutableBufferPointer {
+            for pointer in $0.baseAddress! ..< $0.baseAddress! + count {
+                try body(&pointer.pointee)
+            }
         }
     }
 }

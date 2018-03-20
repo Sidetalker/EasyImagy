@@ -1421,11 +1421,11 @@ extension Image {
     @_specialize(exported: true, where Pixel == Double)
     @_specialize(exported: true, where Pixel == Bool)
     public mutating func update(_ body: (inout Pixel) throws -> ()) rethrows {
-        pixels.withUnsafeMutableBufferPointer {
-            var pointer = $0.baseAddress!
-            for _ in 0..<count {
+        let count = self.count
+        guard count > 0 else { return }
+        try pixels.withUnsafeMutableBufferPointer {
+            for pointer in $0.baseAddress! ..< $0.baseAddress! + count {
                 try body(&pointer.pointee)
-                pointer += 1
             }
         }
     }
